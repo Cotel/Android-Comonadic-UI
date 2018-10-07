@@ -7,9 +7,9 @@ An Android application implemented in a declarative way bringing some concepts f
 
 Comonads are the dual of [Monads](https://arrow-kt.io/docs/patterns/monads/).
 
-A Comonad represents a Space of points. We can consider a UI as a Space of states. So we can build a UI with a Comonad as it is a Space of all possible points, and user actions are movements inside this Space.
+> A Comonad represents a Space of points. We can consider a UI as a Space of states. So we can build a UI with a Comonad as it is a Space of all possible points, and user actions are movements inside this Space. [Source](https://speakerdeck.com/wuct/from-declarative-uis-to-comonadic-uis)
 
-For example, `Store` is a comonadic datatype which holds a state and a render function (lambda) for giving a visual representation of its state. We can `extract()` the Comonad which means giving a representation of the current point in the Space. We can also `move(newState)` the Comonad inside the Space.
+For example, [`Store`](app/src/main/java/cotel/comonadic_ui/datatypes/Store.kt) is a comonadic datatype which holds a state and a render function (lambda) for giving a visual representation of its state. We can `extract()` the Comonad which means giving a representation of the current point in the Space. We can also `move(newState)` the Comonad inside the Space.
 
 ```kotlin
 class MainActivity : Activity() {
