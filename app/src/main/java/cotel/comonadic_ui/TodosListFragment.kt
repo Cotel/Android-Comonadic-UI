@@ -22,20 +22,36 @@ class TodosListFragment : Fragment() {
 
   private fun handleUpdate(input: TodoInputs): Moore<TodoInputs, Store<TodosState, Unit>> =
     when (input) {
-      is AddTodo -> Moore(
-        todosMoore.state.move(todosMoore.state.state.addTodo(input.todo)),
-        ::handleUpdate
-      )
+      is AddTodo -> {
+        ServiceLocator.todosState = ServiceLocator.todosState
+          .copy(todos = ServiceLocator.todosState.todos + input.todo)
+        Moore(
+          todosMoore.state.move(todosMoore.state.state.addTodo(input.todo)),
+          ::handleUpdate
+        )
+      }
 
-      is UpdateTodo -> Moore(
-        todosMoore.state.move(todosMoore.state.state.updateTodo(input.todo)),
-        ::handleUpdate
-      )
+      is UpdateTodo -> {
+        ServiceLocator.todosState = ServiceLocator.todosState
+          .copy(todos = ServiceLocator.todosState.todos.map { todo ->
+            if (todo.id == input.todo.id) input.todo else todo
+          })
+        Moore(
+          todosMoore.state.move(todosMoore.state.state.updateTodo(input.todo)),
+          ::handleUpdate
+        )
+      }
 
-      is RemoveTodo -> Moore(
-        todosMoore.state.move(todosMoore.state.state.removeTodo(input.todo)),
-        ::handleUpdate
-      )
+      is RemoveTodo -> {
+        ServiceLocator.todosState = ServiceLocator.todosState
+          .copy(todos = ServiceLocator.todosState.todos.filterNot { todo ->
+            todo.id == input.todo.id
+          })
+        Moore(
+          todosMoore.state.move(todosMoore.state.state.removeTodo(input.todo)),
+          ::handleUpdate
+        )
+      }
     }
 
   private var todosMoore = Moore(Store(ServiceLocator.todosState) {
