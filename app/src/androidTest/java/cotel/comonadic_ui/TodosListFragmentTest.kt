@@ -1,5 +1,8 @@
 package cotel.comonadic_ui
 
+import android.graphics.Paint
+import android.support.test.espresso.Espresso.onView
+import android.support.test.espresso.matcher.ViewMatchers.withId
 import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import android.view.View
@@ -68,13 +71,11 @@ class TodosListFragmentTest {
           title {
             hasText("One todo")
 
-            // Dunno how to test paint flags ¯\_(ツ)_/¯
+            withPaintFlag(Paint.STRIKE_THRU_TEXT_FLAG)
           }
         }
       }
     }
-
-    assertTrue(ServiceLocator.todosState.todos.first().isCompleted)
   }
 
   @Test
