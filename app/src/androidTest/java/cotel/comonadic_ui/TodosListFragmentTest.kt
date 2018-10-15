@@ -96,14 +96,14 @@ class TodosListFragmentTest {
   }
 
   private fun givenNoTodos() {
-    ServiceLocator.todosState = TodosState(emptyList())
+    ServiceLocator.todosRepository = TodosRepository()
   }
 
   private fun givenTwoTodos() {
-    ServiceLocator.todosState = TodosState(listOf(
+    ServiceLocator.todosRepository = TodosRepository().apply { addAllTodos(listOf(
       Todo("One todo"),
       Todo("Another todo")
-    ))
+    )) }
   }
 
   class TodosListScreen : Screen<TodosListScreen>() {

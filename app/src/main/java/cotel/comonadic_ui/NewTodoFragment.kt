@@ -1,18 +1,14 @@
 package cotel.comonadic_ui
 
-import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import kotlinx.android.synthetic.main.activity_main.*
+import cotel.comonadic_ui.usecases.AddTodo
 import kotlinx.android.synthetic.main.fragment_new_todo.*
 
-class NewTodoFragment : Fragment() {
+class NewTodoFragment : Fragment(), NewTodoPresenter.View {
 
   companion object {
     fun newInstance(): NewTodoFragment = NewTodoFragment()
@@ -22,6 +18,9 @@ class NewTodoFragment : Fragment() {
     fun onNewTodoAttached()
   }
 
+  private val addTodo = AddTodo(ServiceLocator.todosRepository)
+  private val presenter = NewTodoPresenter(this, addTodo)
+
   override fun onCreateView(
     inflater: LayoutInflater, container: ViewGroup?,
     savedInstanceState: Bundle?
@@ -30,7 +29,7 @@ class NewTodoFragment : Fragment() {
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
 
-    submit_todo_button.setOnClickListener { handleSubmitPressed() }
+    presenter.onCreate()
   }
 
   override fun onResume() {
@@ -39,16 +38,23 @@ class NewTodoFragment : Fragment() {
     (activity as NewTodoDelegate).onNewTodoAttached()
   }
 
-  private fun handleSubmitPressed() {
-    val todoTitle = todo_title_input.text.toString()
-
-    if (todoTitle.isNotBlank()) {
-      val currentState = ServiceLocator.todosState
-      ServiceLocator.todosState = currentState
-        .copy(todos = currentState.todos + Todo(todoTitle))
-
-      fragmentManager!!.popBackStack()
-    }
+  override fun setupUI() {
+    submit_todo_button.setOnClickListener { handleSubmitPressed() }
   }
 
+  private fun handleSubmitPressed() {
+    presenter.handleSubmitTodo(todo_title_input.text.toString())
+  }
+
+  override fun showEmptyTitleError() {
+    todo_title_input.error = "Todo title cannot be empty"
+  }
+
+  override fun clearErrors() {
+    todo_title_input.error = null
+  }
+
+  override fun exit() {
+    fragmentManager!!.popBackStack()
+  }
 }

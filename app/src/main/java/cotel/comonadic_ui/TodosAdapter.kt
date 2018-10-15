@@ -13,11 +13,29 @@ class TodosAdapter(
 ) :
   RecyclerView.Adapter<TodosAdapter.ViewHolder>() {
 
-  private var todos: List<Todo> = emptyList()
+  private val todos: MutableList<Todo> = mutableListOf()
 
   fun setTodos(todos: List<Todo>) {
-    this.todos = todos
+    this.todos.clear()
+    this.todos.addAll(todos)
     notifyDataSetChanged()
+  }
+
+  fun updateTodo(todo: Todo) {
+    val todoIndex = todos.indexOfFirst { it.id == todo.id }
+    todos[todoIndex] = todo
+    notifyItemChanged(todoIndex)
+  }
+
+  fun removeTodo(todo: Todo) {
+    val todoIndex = todos.indexOfFirst { it.id == todo.id }
+    todos.removeAt(todoIndex)
+    notifyItemRemoved(todoIndex)
+  }
+
+  fun addTodo(todo: Todo) {
+    todos.add(todo)
+    notifyItemInserted(todos.size - 1)
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
