@@ -34,19 +34,26 @@ class TodosListPresenter(
 
   private fun fetchTodos() {
     val todos = getAllTodos()
-    val newViewComponent = viewComponent.move(todos)
-    newViewComponent.extract()
-    viewComponent = newViewComponent
+    moveViewComponent(todos)
   }
 
   fun handleTodoPressed(todo: Todo) {
     val result = toggleTodo(todo)
-    view.updateTodo(result)
+    val newList = viewComponent.state.map {
+      if (it.id == result.id) result else it
+    }
+    moveViewComponent(newList)
   }
 
   fun handleTodoRemoved(todo: Todo) {
     removeTodo(todo)
-    view.removeTodo(todo)
+    moveViewComponent(viewComponent.state - todo)
+  }
+
+  private fun moveViewComponent(newList: List<Todo>) {
+    val newViewComponent = viewComponent.move(newList)
+    newViewComponent.extract()
+    viewComponent = newViewComponent
   }
 
   private fun render(newTodos: List<Todo>) {
@@ -70,15 +77,15 @@ class TodosListPresenter(
     currentTodos
       .asSequence()
       .filter { todo -> newTodos.containsById(todo) }
-      .filter { todo ->
+      .map { todo ->
         val newTodo = newTodos.first { it.id == todo.id }
-        newTodo.isCompleted != todo.isCompleted
+        newTodo
       }
       .toList()
       .forEach { view.updateTodo(it) }
 
     // Checking which todos from the new state aren't currently added so we add them to the list.
-    val notAddedTodos = newTodos - currentTodos
+    val notAddedTodos = newTodos.filterNot { currentTodos.containsById(it) }
     notAddedTodos.forEach { view.addTodo(it) }
   }
 
